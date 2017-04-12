@@ -33,12 +33,14 @@ TWAIN的硬件层接口被称为源，源管理器负责选择和管理来自不
 - 返回码和错误码
 
 
-
+<div align=center>
 ![](/specImg/TWAIN.png)
+</div>
 <p align = "center">TWAIN组成</p>
 
-
+<div align=center>
 ![](specImg/capability.png)
+</div>
 <p align = "center">参数说明</p>
 
 
