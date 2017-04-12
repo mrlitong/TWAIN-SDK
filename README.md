@@ -1,4 +1,4 @@
-TWAIN-Specification-CHN
+《TWAIN中文开发文档》(译)
 ===================================================
 
 TWAIN
@@ -21,7 +21,7 @@ TWAIN的硬件层接口被称为源，源管理器负责选择和管理来自不
 
 ----------
 说明
-----------
+
 本项目详细阐述了TWAIN的重要组成部分：  
 
 - TWAIN协议原理
@@ -32,13 +32,13 @@ TWAIN的硬件层接口被称为源，源管理器负责选择和管理来自不
 - Capability参数说明（<font color="red">与应用程序开发关系最为密切的部分)</font>
 - 返回码和错误码
 
-----------
+
 
 ![](/specImg/TWAIN.png)
 <p align = "center">TWAIN组成</p>
 
-----------
+
 ![](specImg/capability.png)
 <p align = "center">参数说明</p>
 
-----------
+
