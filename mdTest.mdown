@@ -1,6 +1,0 @@
-#Does markdown syntax work well?
-##New Line.
-
-
-This is not a good.
-[Header.](Header.)
