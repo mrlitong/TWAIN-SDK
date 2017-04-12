@@ -1,7 +1,7 @@
 # <font color = #ff0000>TWAIN-Specification-CHN</font>
 
-----------
 ##TWAIN<font size=2>[维基百科链接](https://en.wikipedia.org/wiki/TWAIN "维基百科-TWAIN")</font>
+
 TWAIN（全写：Technology Without An Interesting Name）是一个软件和数码相机、扫描仪等图像输入设备之间的通讯标准。  
 TWAIN工作组于1990年组成，包含柯达、惠普、罗技等图像设备厂商和Aldus、Caerre等图像软件厂商。  
 这个组织的目标是创建一个满足如下条件的标准：  
