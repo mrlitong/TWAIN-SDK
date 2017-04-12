@@ -19,10 +19,10 @@ TWAIN的硬件层接口被称为源，源管理器负责选择和管理来自不
 用户在TWAIN软件中选择获取图像之后，TWAIN软件和硬件通过一系列交涉来决定如何传输数据。软件描述它需要的图像，而硬件描述它能够提供的图像。  
 如果软硬件在图像格式上达成一致，那么控制被传递到源。源现在可以设置扫描选项，以及开始扫描。  
 
-----------
 说明
+----------
 
-本项目详细阐述了TWAIN的重要组成部分：  
+**本项目完整翻译了TWAIN重要组成部分，并详细阐述了TWAIN的协议机制：**
 
 - TWAIN协议原理
 - 应用程序层
@@ -32,15 +32,13 @@ TWAIN的硬件层接口被称为源，源管理器负责选择和管理来自不
 - Capability参数说明（<font color="red">与应用程序开发关系最为密切的部分)</font>
 - 返回码和错误码
 
+部分翻译截图
+----------
 
-<div align=center>
 ![](/specImg/TWAIN.png)
-</div>
 <p align = "center">TWAIN组成</p>
 
-<div align=center>
 ![](specImg/capability.png)
-</div>
 <p align = "center">参数说明</p>
 
 
