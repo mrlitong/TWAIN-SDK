@@ -36,7 +36,7 @@ TWAIN的硬件层接口被称为源，源管理器负责选择和管理来自不
 <p align = "center">TWAIN组成</p>
 
 ----------
-![](/capability.png)
+![](specImg/capability.png)
 <p align = "center">参数说明</p>
 
 ----------
