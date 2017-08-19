@@ -1,0 +1,172 @@
+One of my applications needed some scanner support.  I thought it might be a good idea
+to get into TWAIN and try it out. Well, here are the results.
+
+
+Firstly, this is NOT a complete implementation of the TWAIN specification. I have followed 
+version  1.8 and have used just the basic  functionality to get an image from a scanner, 
+actually , multiple images too can be acquired one after another. By the way - it will work 
+with didigtal cameras too - anything which exports a TWAIN interface is supported.
+
+
+Well, lets delve a little further into it. Before we do that though, I would have to mention
+that I will not be able to tell you all about TWAIN here. You can download the specification
+at http://www.twain.org. They also have a sample Twain source, if you do not have a scanner 
+and wish to try out TWAIN.
+
+For our purposes here, the important things are the Data Source Manager (DSM) and the Data 
+Source (DS) itself. The DS is the actual scanner or digital camera or any other source 
+which implements TWAIN. The DSM is the module that provides us an interface to the DSM.
+And yes, this is a very simplistic view of TWAIN ( I shudder to think of what the TWAIN
+designers would make of my description ).
+
+Now for the class itself. First, the header Twain.h has to be included. I've called my
+class, rather unimaginatively CTwain. Now this class requires the TWAIN_32.DLL module
+to be loaded. The way I have handled it is by keeping a static Module handle and incrementing
+and decrementing the reference count. When the interface is released for the last time,
+the module is unloaded.
+
+Mostly, the class is quite independant of everything else. What it does require though,
+is a handle to window to which the DSM can send messages. These messages are not meant
+for the application itself but for Twain implementor, in this case CTwain. This window
+handle can be passed either to the constructor, or if as is more likely, if the window isn`t
+ready yet, in a call to InitTwain.
+
+The CTwain class is an abstract class as it has one pure virtual method. So to use this
+class you will have to derive from CTwain.
+
+I will now explain the important methods - the ones which will let you start scanning .
+
+<bold>
+CTwain(HWND hWnd= NULL) -- Constructor
+</bold>
+	The hwnd is optional. If a non Null value is given, the Twain interface is initialized
+	using this handle.
+
+<bold>
+~CTwain() -- Destructor
+</bold>
+
+<bold>
+InitTwain(HWND hWnd) -- Initializes TWAIN
+</bold>
+	This is called by the constructor if the handle passed to the constructor is not null.
+	Else, it can be called later . Loads the Twain Dll and initializes it.
+
+<bold>
+ReleaseTwain() --  Releases Twain interface
+</bold>
+	NOTE : If TWAIN has been initialized, this must be called before the window handle passed
+	to it is destroyed. Not doing so will result in resource and memory leaks.
+
+<bold>
+GetIdentity()  --  Identitifies application
+</bold>
+	This is called by InitTwain to initialize the TW_IDENTITY structure. Please refer to 
+	twain.h for the structure memnbers and to CTwain::GetIdentity for an example as to 
+	how to fill these members. As for now, you need not implement this as long as the
+	default behaviour suits you. 
+ 
+<bold>
+IsValidDriver()  -- Returns true if the Driver was loaded successfully
+</bold>
+
+<bold>
+SourceSelected() -- Returns true if a source was selected successfully
+</bold>
+
+<bold>
+SourceEnabled()  -- Returns true if a source is enabled
+</bold>
+	In TWAIN parlance, a source being enabled means a scan is in progress.
+
+<bold>
+SelectDefaultSource() -- Selects the default source for the current machine
+</bold>
+	
+<bold>
+SelectSource() -- Shows the Select Source Dialog box and allows the user to select one
+</bold>
+
+
+<bold>
+Acquire(int numImages=1) -- Starts image acquisition
+</bold>
+	This does not necessarily mean the scanning process is started. All it actually 
+	means is that the Source has been enabled and typically a Scanning parameters 
+	dialog box has been opened. Scanning typically starts from there.
+	numImages is the number of images that the application can handle or
+	TWCPP_ANYCOUNT for any number.
+
+<bold>
+ProcessMessage(MSG msg) -- Processes messages from Twain
+</bold>
+	This should be called from the message loop of the window which is intially
+	passed to the class. 
+	NOTE : All messages can be passed to this routine. It ignores all Non-Twain messages
+	and will not act on them unless the source is enabled - so it is not a performance
+	botte-neck either.
+
+<bold>
+ShouldTransfer(TW_IMAGEINFO& info)
+</bold>
+	This is called every time an image is to be scanned. It should return one of
+	the following values :
+		TWCPP_CANCELTHIS	: Cancel this image transfer
+		TWCPP_CANCELALL		: Abort all transfers
+		TWCPP_DOTRANSFER	: Continue with transfer
+
+	The default implementation returns TWCPP_DOTRANSFER.
+
+<bold>
+CopyImage(HANDLE hBitmap,TW_IMAGEINFO& info)
+</bold>
+	This is a pure virtual method which will get called everytime an image is
+	transferred from TWAIN. How the image is to be used is upto the 
+	application.
+
+
+Well - these are the routines you would typically use . You can probably do a lot more
+too, but the TWAIN specification can probably help you a lot more there than I can.
+
+Now for the demo application. 
+
+What I have done is used mutiple inheritance with regard to CMainFrame. I figured that would 
+be the simplest way to handle things. So CMainFrame is derived from CTwain. InitTwain is 
+called from the OnCreate member of CMainFrame. Though the destructor would automatically
+be called when the window closes, the window handle would not be valid at that time. So
+I call ReleaseTwain from the OnDestroy member function of CMainFrame.
+
+The two additions to the File Menu are 
+	Select Source
+	Acquire
+
+Select Source shows the default dialog which lists the TWAIN sources available.
+Acquire starts the actual acquisition process.
+
+CTwain::ProcessMessage is called from the PreTranslateMessage member of CMainFrame.
+
+Also CMainFrame implements CopyImage. This in turn calls CMainFrame::SetImage which
+creates a new document along with a frame and assigns the bitmap scanned to that document.
+So as new images are scanned new documents are created.
+
+I guess thats it as far as explanations go. I will now very briefly just go through the
+steps required to start scanning .
+
+First , create a class derived from CTwain. Implement CopyImage to handle bitmaps.
+Bitmaps are sent as a handle to a Device Independant Bitmap . In the demo app ,
+this is handled with a class -CDIB .
+
+Now in the pretranslate member of the window`s class,
+insert this line :
+		ProcessMessage(*pMsg);
+
+Add the two menu items - Select Source and Acquire as done in CMainFrame in the demo app.
+
+And well - you`re done. Thats it - the only thing you really have to work on is CopyImage.
+
+
+
+
+
+
+
