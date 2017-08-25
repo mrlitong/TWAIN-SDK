@@ -1,42 +1,25 @@
-TWAIN介绍
-----------
+## TWAIN协议介绍
 
-随着各种扫描仪、数码相机和其他图像获取设备的出现和普及使用，相当多客户的业务系统将扫描仪等引入作为系统外设。然而市场上扫描仪、数据相机类型众多，客户应用程序如何来使用这些扫描仪和数据相机。
+> TWAIN（全写：Technology Without An Interesting Name）是一个软件和数码相机、扫描仪等图像输入设备之间的通讯标准。此标准如下：
+> - 多平台支持
+> - 兼容多种设备
+> - 广泛的软硬件支持
+> - 可拓展性
+> - 易用性
+> - 多图像格式支持
+>
+> 从硬件到软件，TWAIN包含四层：硬件、源、源管理器和软件。硬件厂家的TWAIN支持通常体现为支持TWAIN接口的驱动程序。TWAIN的硬件层接口被称为源，源管理器负责选择和管理来自不同硬件厂家的源。在微软的Windows上，源管理器是以DLL方式实现。TWAIN软件不直接调用硬件厂家的TWAIN接口，而是通过源管理器。用户在TWAIN软件中选择获取图像之后，TWAIN软件和硬件通过一系列交涉来决定如何传输数据。软件描述它需要的图像，而硬件描述它能够提供的图像。如果软硬件在图像格式上达成一致，那么控制被传递到源。源现在可以设置扫描选项，以及开始扫描。
+> [https://zh.wikipedia.org/wiki/TWAIN](https://zh.wikipedia.org/wiki/TWAIN "https://zh.wikipedia.org/wiki/TWAIN")
 
-早期支持显示和光栅数据处理的应用程序针对每种图象获取设备都需要单独设计用户界面、设备驱动程序，在这种情况下，当设备不断升级时，应用程序也要进行相应的修改，使用维护难度增大，维护成本升高。
-  
-在这种前提下，扫描仪及数据相机等图像获取设备的开发商和应用软件开发商都意识到需要在设备和应用之间定义一个标准的通信协议，使设备能被更多的应用程序支持，同时使应用程序不需要修改就能支持更多的设备或设备的更新。
-TWAIN就是在这种追求一致性和简单性的背景下产生的。  
+## TWAIN结构
+![](https://github.com/mrlitong/TWAIN-SDK/blob/master/source/twain_layout.jpg)
 
-TWAIN接口标准
-----------
-TWAIN（全写：Technology Without An Interesting Name）是一个软件和数码相机、扫描仪等图像输入设备之间的通讯标准，也是一项重要的国际标准。它实现了以下接口的统一： 
+在该图中可以看到Source Manager作为Application与Source沟通的桥梁起着非常重要的作用，通过统一入口函数DSM_Entry(),我们可以在Application和Source之间传递消息，从而达到通讯的目的。而Source Manager与Source的通讯通过DS_Entry(）来进行，开发者不必也无需关心此函数如何被调用。
 
-- 多平台支持
-- 兼容多种设备
-- 广泛的软硬件支持
-- 可扩展性
-- 针对最终用户和软件开发人员的易用性
-- 多种图像格式支持  
 
-从硬件到软件，TWAIN包含四层：硬件、源、源管理器和软件。硬件厂家的TWAIN支持通常体现为支持TWAIN接口的驱动程序。 
- 
-TWAIN的硬件层接口被称为源，源管理器负责选择和管理来自不同硬件厂家的源。在微软的Windows上，源管理器是以DLL方式实现。TWAIN软件不直接调用硬件厂家的TWAIN接口，而是通过源管理器。  
 
-用户在TWAIN软件中选择获取图像之后，TWAIN软件和硬件通过一系列交涉来决定如何传输数据。软件描述它需要的图像，而硬件描述它能够提供的图像。  
-如果软硬件在图像格式上达成一致，那么控制被传递到源。源现在可以设置扫描选项，以及开始扫描。  
 
-项目说明
-----------
-
-- TWAIN协议原理
-- 应用程序层
-- 源实现层
-- 三元组实现统一接口
-- 数据类型及数据结构
-- Capability参数说明
-- 返回码和错误码
-- Windows SDK
-- Web SDK
+## What's TWAIN-SDK?
+As you can see above introduction of TWAIN,which is just a protocol bewteen application and digital imaging devices.TWAIN will not be able to help you with digital imaging based application development.So,here is a cross-platform SDK that will enable you to develop your application without consideration about how different interfaces are.
 
 
