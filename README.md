@@ -1,4 +1,4 @@
-TWAIN协议介绍
+TWAIN protocol introduction
 ====
 
 > TWAIN（全写：Technology Without An Interesting Name）是一个软件和数码相机、扫描仪等图像输入设备之间的通讯标准。此标准如下：
