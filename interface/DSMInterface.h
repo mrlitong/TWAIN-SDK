@@ -36,8 +36,8 @@
 * @date April 2007
 */
 
-#ifndef __DSMINTERFACE_H__
-#define __DSMINTERFACE_H__
+#ifndef _DSMINTERFACE_H_
+#define _DSMINTERFACE_H_
 
 #pragma once
 
@@ -131,4 +131,4 @@ void _DSM_UnlockMemory(TW_HANDLE _hMemory);
 */
 TW_UINT16 HandleEvent(TW_EVENT &twEvent);
 
-#endif // __DSMINTERFACE_H__
+#endif // _DSMINTERFACE_H_
