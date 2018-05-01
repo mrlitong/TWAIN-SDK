@@ -1,7 +1,6 @@
 #include "twain.h"
 
 #include <iostream>
-using namespace std;
 
 /**
 * Display the last windows error messages.
@@ -9,7 +8,7 @@ using namespace std;
 
 void printWindowsErrorMessage()
 {
-	
+
 	LPVOID lpMsgBuf;
 	DWORD dw = GetLastError();
 
@@ -22,9 +21,9 @@ void printWindowsErrorMessage()
 		(LPTSTR)&lpMsgBuf,
 		0, NULL);
 
-	cerr << "Error: id [" << dw << "] msg [" << lpMsgBuf << "]" << endl;
+    std::cerr << "Error: id [" << dw << "] msg [" << lpMsgBuf << "]" << std::endl;
 
 	LocalFree(lpMsgBuf);
-	
+
 }
 
