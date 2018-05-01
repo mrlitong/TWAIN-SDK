@@ -51,7 +51,6 @@ TCHAR * GetErrString(TCHAR *str, DWORD errcode)
 }
 
 
-//0表示false，非0值表示true
 bool CheckScannerVendor(ScannerVendor vendor) {
 	char szTraceBuf[256];
 	// Get device interface info set handle for all devices attached to system
@@ -71,7 +70,7 @@ bool CheckScannerVendor(ScannerVendor vendor) {
 	sprintf_s(szTraceBuf, "Device info set handle for all devices attached to " \
 		"system: 0x%x\n", hDevInfo);
 	OutputDebugStringA(szTraceBuf);
-	// Retrieve a context structure for a device interface of a device 
+	// Retrieve a context structure for a device interface of a device
 	// information set.
 	DWORD dwIndex = 0;
 	SP_DEVICE_INTERFACE_DATA devInterfaceData;
@@ -104,17 +103,12 @@ bool CheckScannerVendor(ScannerVendor vendor) {
 				break;
 			}
 		} else {
-
-			//   发现一个HID设备,获取设备的详细信息 
-			//   第一次调用SetupDiGetDeviceInterfaceDetail得到ClassDeviceData的大小,但返回错误 
 			SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInterfaceData,
 				NULL, 0, &requiredLength, NULL);
 			neededLength = requiredLength;
 			ClassDeviceData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)malloc(neededLength);
 			ClassDeviceData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
-			//第二次调用SetupDiGetDeviceInterfaceDetail   
-			//   使用 合适的neededLength. 
 			if (!SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInterfaceData,
 				ClassDeviceData, neededLength, &requiredLength, NULL)) {
 				free(ClassDeviceData);
@@ -147,13 +141,11 @@ bool CheckScannerVendor(ScannerVendor vendor) {
 				LOG(ERROR) << "[CheckScannerVendor] fail to recognize scanner: ";//<< devpath;
 			}
 
-			//  // 建立HID设备的句柄 
 			//HANDLE handle = CreateFile(ClassDeviceData->DevicePath,
 			//	GENERIC_READ | GENERIC_WRITE,
 			//	FILE_SHARE_READ | FILE_SHARE_WRITE,
 			//	NULL, OPEN_EXISTING, 0, NULL);
 
-			////   获取   attributes   以便得到Vendor   ID   和   Product   ID 
 			//BOOLEAN retOK = HidD_GetAttributes(handle, &attributes);
 
 			//CloseHandle(handle);
