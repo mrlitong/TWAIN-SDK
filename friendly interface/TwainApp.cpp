@@ -1,5 +1,3 @@
-
-
 #ifdef _WINDOWS
 #include "stdafx.h"
 #endif
@@ -39,7 +37,7 @@ extern
 #ifdef TWH_CMP_MSC
 TW_UINT16 FAR PASCAL
 #else
-FAR PASCAL TW_UINT16 
+FAR PASCAL TW_UINT16
 #endif
 DSMCallback(pTW_IDENTITY _pOrigin,
 pTW_IDENTITY _pDest,
@@ -168,7 +166,7 @@ void TwainApp::exit(bool unloadDSM)
 				}
 				disableDS();
 				//m_DSMState = 4;
-			} 
+			}
 			unloadDS();
 			//m_DSMState = 3;
 		}
@@ -363,7 +361,7 @@ pTW_IDENTITY TwainApp::getDefaultDataSource()
 		LOG(ERROR) << "Failed to get the data source info!";
 		break;
 	}
-	
+
 	return m_pDataSource;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -422,7 +420,7 @@ int TwainApp::loadDS()
 		return 1;
 	}
 
-	// Reinitilize these 
+	// Reinitilize these
 	m_nGetLableSupported = TWCC_SUCCESS;
 	m_nGetHelpSupported = TWCC_SUCCESS;
 
@@ -750,7 +748,7 @@ bool TwainApp::enableDS(TW_HANDLE hWnd, BOOL bShowUI)
 
 		TW_STATUS twStatus;
 		_DSM_Entry(
-			&(m_MyInfo), 
+			&(m_MyInfo),
 			m_pDataSource,
 			DG_CONTROL,
 			DAT_STATUS,
@@ -874,14 +872,14 @@ void TwainApp::initiateTransfer_Native() {
 			break;
 		}
 		// The data returned by ImageInfo can be used to determine if this image is wanted.
-		// If it is not then DG_CONTROL / DAT_PENDINGXFERS / MSG_ENDXFER can be 
+		// If it is not then DG_CONTROL / DAT_PENDINGXFERS / MSG_ENDXFER can be
 		// used to skip to the next image.
 		TW_MEMREF hImg = 0;
 
 		twrc = DSM_Entry(DG_IMAGE, DAT_IMAGENATIVEXFER, MSG_GET, (TW_MEMREF)&hImg);
 
 		if (TWRC_XFERDONE == twrc) {
-			// -Here we get a handle to a DIB. Save it to disk as a bmp. 
+			// -Here we get a handle to a DIB. Save it to disk as a bmp.
 			// -After saving it to disk, I could open it up again using FreeImage
 			// if I wanted to do more transforms on it or save it as a different format.
 			PBITMAPINFOHEADER pDIB = (PBITMAPINFOHEADER)_DSM_LockMemory(hImg);
@@ -945,7 +943,7 @@ void TwainApp::initiateTransfer_Native() {
 			TW_PENDINGXFERS pendxfers;
 			memset(&pendxfers, 0, sizeof(pendxfers));
 			twrc = DSM_Entry(DG_CONTROL, DAT_PENDINGXFERS, MSG_ENDXFER, (TW_MEMREF)&pendxfers);
-			// MSG_RESET, Í£Ö¹É¨Ãè 
+			// MSG_RESET, Í£Ö¹É¨Ãè
 			if (TWRC_SUCCESS == twrc) {
 				//LOG(INFO) << "app: Remaining images to transfer: " << pendxfers.Count;
 				if (0 == pendxfers.Count) {
@@ -956,7 +954,7 @@ void TwainApp::initiateTransfer_Native() {
 				} else if (!shouldContinueScan()) { // be asked to abort scanning
 					//twrc = DSM_Entry(DG_CONTROL, DAT_PENDINGXFERS, MSG_STOPFEEDER, (TW_MEMREF)&pendxfers);
 					twrc = DSM_Entry(DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET, (TW_MEMREF)&pendxfers);
-					LOG(INFO) << "twrc: " << twrc << ", cnt: " << pendxfers.Count 
+					LOG(INFO) << "twrc: " << twrc << ", cnt: " << pendxfers.Count
 						<< ", m_nXferNum: " << m_nXferNum ;
 				} else {
 					//LOG(INFO) << "[] signal to stop scanning";
@@ -983,7 +981,7 @@ void TwainApp::initiateTransfer_Native() {
 	}
 
 	// Check to see if we left the scan loop before we were actualy done scanning
-	// This will hapen if we had an error.  Need to let the DS know we are not going 
+	// This will hapen if we had an error.  Need to let the DS know we are not going
 	// to transfer more images
 	if (bPendingXfers == true) {
 		twrc = DoAbortXfer();
@@ -991,7 +989,7 @@ void TwainApp::initiateTransfer_Native() {
 
 	// adjust our state now that the scanning session is done
 	m_DSMState = 5;
-	
+
 	PrintCMDMessage("app: DONE!\n");
 
 	this->SaveImageFiles(this->m_imageFiles);
@@ -1008,7 +1006,7 @@ int TwainApp::SaveImageFiles(vector<string>& v)
 
 	fp.open(output, fstream::in | fstream::out | fstream::trunc);
 
-	//fp.seekg(0, ios::end);   
+	//fp.seekg(0, ios::end);
 
 	for (auto e : v)
 	{
@@ -1361,7 +1359,7 @@ void TwainApp::initiateTransfer_File(TW_UINT16 fileformat /*= TWFF_TIFF*/)
 			break;
 		}
 		// The data returned by ImageInfo can be used to determine if this image is wanted.
-		// If it is not then DG_CONTROL / DAT_PENDINGXFERS / MSG_ENDXFER can be 
+		// If it is not then DG_CONTROL / DAT_PENDINGXFERS / MSG_ENDXFER can be
 		// used to skip to the next image.
 
 		if (fileformat != TWFF_TIFFMULTI)
@@ -1437,7 +1435,7 @@ void TwainApp::initiateTransfer_File(TW_UINT16 fileformat /*= TWFF_TIFF*/)
 	}
 #endif
 	// Check to see if we left the scan loop before we were actualy done scanning
-	// This will hapen if we had an error.  Need to let the DS know we are not going 
+	// This will hapen if we had an error.  Need to let the DS know we are not going
 	// to transfer more images
 	if (bPendingXfers == true)
 	{
@@ -1488,7 +1486,7 @@ void TwainApp::initiateTransfer_Memory()
 			break;
 		}
 		// The data returned by ImageInfo can be used to determine if this image is wanted.
-		// If it is not then DG_CONTROL / DAT_PENDINGXFERS / MSG_ENDXFER can be 
+		// If it is not then DG_CONTROL / DAT_PENDINGXFERS / MSG_ENDXFER can be
 		// used to skip to the next image.
 
 		// Set the filename to save to
@@ -1657,7 +1655,7 @@ void TwainApp::initiateTransfer_Memory()
 	}
 
 	// Check to see if we left the scan loop before we were actualy done scanning
-	// This will hapen if we had an error.  Need to let the DS know we are not going 
+	// This will hapen if we had an error.  Need to let the DS know we are not going
 	// to transfer more images
 	if (bPendingXfers == true)
 	{
@@ -2204,7 +2202,7 @@ string TwainApp::GetSerialNumber()
 	capSN.hContainer = 0;
 
 	TW_INT16 rc = get_CAP(capSN);
-	
+
 	string sn;
 	if (rc == TWRC_SUCCESS)
 	{
@@ -2225,7 +2223,7 @@ DWORD WINAPI TwainApp::SaveImageFileWorker(LPVOID pM)
 
 	TwainApp* app = (TwainApp*)pM;
 
-	
+
 	//if( ConnectImagePipe() != 0) {
 		//printf("Can not connect to image pipe, exit the thread.\n");
 		//return 0;
@@ -2304,7 +2302,7 @@ DWORD WINAPI TwainApp::SaveImageFileWorker(LPVOID pM)
 
 			// callback queue
 			app->mpWritedImageQueue->push(info);
-			
+
 
 			PrintCMDMessage("Thead: File \"%s\" saved...\n", szOutFileName);
 
@@ -2316,7 +2314,7 @@ DWORD WINAPI TwainApp::SaveImageFileWorker(LPVOID pM)
 		_DSM_Free(pDIB);
 		pDIB = 0;
 
-		
+
 	}
 
 

@@ -61,8 +61,8 @@
  * Ricoh Corporation, and Xerox Corporation.
  * All rights reserved.
  */
-#ifndef __TWAINAPP_H__
-#define __TWAINAPP_H__
+#ifndef _TWAINAPP_H_
+#define _TWAINAPP_H_
 
 #pragma once
 
@@ -182,7 +182,7 @@ public:
 	* Sources available and build a list of DS and store them in m_DataSources.
 	*/
 	int getSources();
-	
+
 	/**
 	* Try to load a Data Source.  Loads the data source with the ID passed in.
 	* To open a Data Source the DSM must be in state 3 (Open).  If successful
@@ -429,7 +429,7 @@ public:
 	void RegisterPostScanCallback(PostScanCallback fnPScan) {
 		this->mPostScanCallbck = fnPScan;
 	}
-	
+
 	int SaveImageFiles(vector<string>& v);
 
 	int SaveTWCC(pTW_IDENTITY pId, TW_INT16& _cc);
@@ -444,7 +444,7 @@ public:
 	string GetSerialNumber();
 
 
-	
+
 
 
 
@@ -458,7 +458,7 @@ private:
 	int    m_batchNo;
 	string m_strRootPath;
 
-	// inner queue, image has been scanned but not saved as bmp format, 
+	// inner queue, image has been scanned but not saved as bmp format,
 	// will be saved by another thread
 	//BlockQueue<ImageInfo>  mPendingSaveImageQueue;
 
@@ -472,4 +472,4 @@ protected:
 	vector<string> m_imageFiles;
 };
 
-#endif //  __TWAINAPP_H__
+#endif //  _TWAINAPP_H_
