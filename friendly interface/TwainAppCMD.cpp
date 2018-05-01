@@ -95,7 +95,6 @@ void TwainAppCMD::printAvailableDataSources() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-//在所有已存在扫描仪中查找指定型号是否存在
 bool findTypeInProducts(const std::string& name, const std::vector<string>& productsName) {
 	for (size_t i = 0; i < productsName.size(); ++i) {
 		std::string type = CommonUtils::GetProductType(productsName[i]);
@@ -105,12 +104,11 @@ bool findTypeInProducts(const std::string& name, const std::vector<string>& prod
 	}
 	return false;
 }
-//尝试从LevelDB中加载先前的扫描仪
 int TwainAppCMD::tryLoadDS(TW_INT32 _dsID) {
 	if (_dsID == -1) { // try use previous one
 		std::string scanner = CommonLevelDB::getInstance()->getValue("PrevScanner");
 		Configuration* config = Configuration::getInstance();
-		if (scanner.empty()) //加载先前的DS失败
+		if (scanner.empty())
 			return 1;
 		for (size_t i = 0; i < m_DataSources.size(); i++) {
 			if (m_DataSources[i].ProductName != scanner)
@@ -133,13 +131,13 @@ int TwainAppCMD::tryLoadDS(TW_INT32 _dsID) {
 					brand = CommonUtils::GetProductBrand(productsName[j]);
 					type = CommonUtils::GetProductType(productsName[j]);
 					if (product.find(brand) != std::string::npos) {
-						if (findTypeInProducts(product, productsName) == false) {  //找到品牌没找到型号，直接加载默认配置
+						if (findTypeInProducts(product, productsName) == false) {
 							current_scanner_type = brand.c_str();
 							brand[0] = toupper(brand[0]);
 							config->updateProduct(brand);
 							return 0;
 						}
-						else if (product.find(type) != std::string::npos) {   //同时匹配到了品牌和型号
+						else if (product.find(type) != std::string::npos) {
 							current_scanner_type = brand.c_str();
 							brand[0] = toupper(brand[0]);
 							config->updateProduct(brand + ' ' + type);
@@ -147,9 +145,9 @@ int TwainAppCMD::tryLoadDS(TW_INT32 _dsID) {
 						}
 					}
 				}
-				if (j == productsName.size()) {   //表明在已有的扫描仪配置中压根儿没找到这个型号
+				if (j == productsName.size()) {
 					product = "other";
-					LOG(INFO) << "[tryLoadDS] 无法识别该扫描仪" << _dsID;
+					LOG(INFO) << "[tryLoadDS] can not recoginaze this scanner." << _dsID;
 				}
 				//#####################################################################################################################
 				return 0;
@@ -172,7 +170,7 @@ int TwainAppCMD::tryLoadDS(TW_INT32 _dsID) {
 }
 
 int TwainAppCMD::loadDS(bool isRedPaper) {
-	// 尝试加载DS
+	// try to load DS
 	int errorCode = 1;
 	Configuration* config = Configuration::getInstance();
 	if ((errorCode = tryLoadDS(-1)) != 0) { // fail to load previous available ds
@@ -183,7 +181,7 @@ int TwainAppCMD::loadDS(bool isRedPaper) {
 			LOG(INFO) << "[loadDS] will try load product " << product;
 
 			//##################################################################################################
-			map<string, ScannerVendor> scannerVenderMap;  //映射
+			map<string, ScannerVendor> scannerVenderMap;
 			scannerVenderMap.insert(pair<string, ScannerVendor>("canon", CANON));
 			scannerVenderMap.insert(pair<string, ScannerVendor>("panasonic", PANASONIC));
 			scannerVenderMap.insert(pair<string, ScannerVendor>("kodak", KODAK));
@@ -216,13 +214,12 @@ int TwainAppCMD::loadDS(bool isRedPaper) {
 						}
 					}
 				}
-			}//for(size_t i = 0; i < productsName.size(); ++i) 
+			}//for(size_t i = 0; i < productsName.size(); ++i)
 			//##################################################################################################
 		}// for(unsigned int x = 0; x < m_DataSources.size(); ++x)
 	}   //if((errorCode = tryLoadDS(-1)) != 0)
 
 
-	// 加载对应的配置
 	if (errorCode > 0)
 		return errorCode;
 	if (m_DSMState == 4) {
@@ -230,7 +227,7 @@ int TwainAppCMD::loadDS(bool isRedPaper) {
 
 		LOG(WARNING) << SCANNER_NAME_TAG << m_pDataSource->ProductName;
 		CommonUtils::setScannnerName(m_pDataSource->ProductName);
-		string productName = m_pDataSource->ProductName;  //productName一定是当前正连接的扫描仪全名
+		string productName = m_pDataSource->ProductName;
 		transform(productName.begin(), productName.end(), productName.begin(), ::tolower);
 
 		///////////////////////////////////////////////////////////////////////////////////////
@@ -242,7 +239,7 @@ int TwainAppCMD::loadDS(bool isRedPaper) {
 		for (size_t i = 0; i < productsName.size(); ++i) {
 			brand = CommonUtils::GetProductBrand(productsName[i]);
 			type = CommonUtils::GetProductType(productsName[i]);
-			if (productName.find(brand) != std::string::npos && productName.find(type) != std::string::npos) { //同时匹配到型号和品牌
+			if (productName.find(brand) != std::string::npos && productName.find(type) != std::string::npos) {
 				brand[0] = toupper(brand[0]);
 				m_pDriverConfig = Configuration::getInstance()->getDriverConfig(brand + ' ' + type);
 				this->InitScanner(brand);
@@ -703,58 +700,39 @@ void TwainAppCMD::InitPanasonic() {
 
 	//this->ResetAll();
 
-	//过滤空白页done
 	set_CapabilityOneValue(PCAP_AUTOSKIPBLANKPAGES, m_pDriverConfig->AutoDiscardBlankPage, TWTY_INT32);
 
-	//扫描指示器done
 	set_CapabilityOneValue(CAP_INDICATORS, m_pDriverConfig->Indicator, TWTY_BOOL);
 
-	//隐藏错误弹窗done
-	set_CapabilityOneValue(PCAP_HIDEERRDIALOG, m_pDriverConfig->HideErrDialog, TWTY_BOOL);	//最好为false
+	set_CapabilityOneValue(PCAP_HIDEERRDIALOG, m_pDriverConfig->HideErrDialog, TWTY_BOOL);
 
-	//是否显示错误信息done
-	set_CapabilityOneValue(PCAP_SHOWERRMSG, m_pDriverConfig->ShowErrMsg, TWTY_BOOL); // 最好为true
+	set_CapabilityOneValue(PCAP_SHOWERRMSG, m_pDriverConfig->ShowErrMsg, TWTY_BOOL);
 
-	//扫描速度done
 	//set_CapabilityOneValue(CAP_FEEDERENABLED, TRUE, TWTY_BOOL);
 	//set_CapabilityOneValue(PCAP_FEEDINGSPEED, m_pDriverConfig->FeedingSpeed, TWTY_UINT16);
 
-	//是否双页扫描done
 	set_CapabilityOneValue(CAP_DUPLEXENABLED, m_pDriverConfig->DuplexEnabled, TWTY_BOOL);
 
-	//判断是否为长卷子模式done
 	if (m_pDriverConfig->PaperLen == 0) {
-		//不是长卷子模式
-		//自动长度检测，如果设置了边界检测，此值的设置将被忽略！
 		set_CapabilityOneValue(ICAP_AUTOMATICLENGTHDETECTION, FALSE, TWTY_BOOL);
-		//欲使边界检测生效，此参数必须为TRUE
 		set_CapabilityOneValue(ICAP_UNDEFINEDIMAGESIZE, TRUE, TWTY_BOOL);
-		//自动边界检测(但是无法对长试卷进行边界检测，会截断）
 		set_CapabilityOneValue(ICAP_AUTOMATICBORDERDETECTION, m_pDriverConfig->AutoBorderDetection, TWTY_BOOL);
 	}
 	else {
-		//长卷子模式，会有黑边
-		//扫描纸张大小,松下5046支持以下纸张标准：
 		//		TWSS_NONE TWSS_JISB5 TWSS_USLETTER TWSS_USLEGAL
 		//		TWSS_USLEDGER TWSS_A3 TWSS_A4 TWSS_A5 TWSS_A6 TWSS_JISB4 TWSS_JISB6 TWSS_BUSINESSCARD
 		set_CapabilityOneValue(ICAP_SUPPORTEDSIZES, TWSS_NONE, TWTY_UINT16);
-		//自动长度检测,注意，长度检测和边界检测不能共存，否则边界检测会掩盖长度检测！
 		set_CapabilityOneValue(ICAP_AUTOMATICLENGTHDETECTION, TRUE, TWTY_BOOL);
 	}
 
-	//旋转指定角度done TWOR_ROT0, TWOR_ROT90, TWOR_ROT180, TWOR_ROT270 TWOR_AUTO
 	set_CapabilityOneValue(ICAP_ORIENTATION, m_pDriverConfig->Orientation, TWTY_UINT16);
 
-	//倾斜校正done
 	set_CapabilityOneValue(ICAP_AUTOMATICDESKEW, m_pDriverConfig->AutoSkew, TWTY_BOOL);
 
-	// 0:BW, 1:GRAY, 2:RGB, TBC..TBD
 	set_CapabilityOneValue(ICAP_PIXELTYPE, m_pDriverConfig->PixelType, TWTY_UINT16); // 0
 
-	// 图像增强
 	set_CapabilityOneValue(0x8200, m_pDriverConfig->RedColorEnhance, TWTY_UINT16);
 
-	//双页进纸检测done
 	set_CapabilityOneValue(PCAP_DOUBLEFEEDDETECTION, m_pDriverConfig->DoubleFeedDetection, TWTY_UINT16);
 	set_CapabilityOneValue(PCAP_DOUBLEFEEDDETECTION_SENSITIVITY, m_pDriverConfig->DoubleFeedDetectionSensitivity, TWTY_UINT16); // -灵敏度: 1. 正常
 	set_CapabilityOneValue(PCAP_DOUBLEFEEDDETECTION_ACTION, m_pDriverConfig->DoubleFeedDetectionResponse, TWTY_UINT16); // -动作: 停止(2)
@@ -762,9 +740,8 @@ void TwainAppCMD::InitPanasonic() {
 	TW_FIX32 contrast;
 	contrast.Whole = m_pDriverConfig->Contrast;
 	contrast.Frac = 0;
-	set_CapabilityOneValue(ICAP_CONTRAST, &contrast);	//对比度
+	set_CapabilityOneValue(ICAP_CONTRAST, &contrast);
 
-	//分辨率done
 	TW_FIX32 resolution;
 	resolution.Whole = m_pDriverConfig->ResolutionWhole; // 200
 	resolution.Frac = m_pDriverConfig->ResolutionFraction; // 0
@@ -774,125 +751,99 @@ void TwainAppCMD::InitPanasonic() {
 	TW_FIX32 brightness;
 	brightness.Whole = m_pDriverConfig->Brightness;
 	brightness.Frac = 0;
-	set_CapabilityOneValue(ICAP_BRIGHTNESS, &brightness); // 亮度
+	set_CapabilityOneValue(ICAP_BRIGHTNESS, &brightness); //
 
 
 
-	//自动旋转done(但是自动旋转功能并不精确，也就是正确旋转的概率不是100%）
 	//set_CapabilityOneValue(PCAP_AUTOROTATE, FALSE, TWTY_BOOL);
 
-	//自动旋转参考文字done
 	//set_CapabilityOneValue(PCAP_AUTOROTATE_LANGUAGE,10, TWTY_UINT16);		//TWAR_LG_TCHINESE
 }
 
 void TwainAppCMD::InitCanon() {
 
-	//智能旋转：根据文字方向完成旋转,生效
-	//此功能可能会降低扫描速度，表现为：扫描仪扫几张就卡几秒。
 	ScanType scanType = ScanManager::getInstance()->getScanType();
 	if (/*scanType == kEditableTemplate ||*/ scanType == kOriginalPaper) {
 		this->ResetAll();
 		set_CapabilityOneValue(CCAP_AUTOROTATEDIRECTION, m_pDriverConfig->AutoRotate, TWTY_BOOL);
-		set_CapabilityOneValue(CCAP_ORIENTATION, m_pDriverConfig->Orientation, TWTY_INT32);	//如果开启智能旋转，则应关闭旋转角度功能。
+
+		set_CapabilityOneValue(CCAP_ORIENTATION, m_pDriverConfig->Orientation, TWTY_INT32);
 	}
 	else {
 		set_CapabilityOneValue(CCAP_AUTOROTATEDIRECTION, FALSE, TWTY_BOOL);
-		//旋转指定角度 TWOR_ROT0, TWOR_ROT90, TWOR_ROT180, TWOR_ROT270
+		//TWOR_ROT0, TWOR_ROT90, TWOR_ROT180, TWOR_ROT270
 		set_CapabilityOneValue(CCAP_ORIENTATION, m_pDriverConfig->Orientation, TWTY_INT32);
 	}
 
-	//自动检测边界
 	set_CapabilityOneValue(ICAP_AUTOMATICBORDERDETECTION, m_pDriverConfig->AutoBorderDetection, TWTY_BOOL);
 
-	//自动倾斜校正
 	set_CapabilityOneValue(ICAP_AUTOMATICDESKEW, m_pDriverConfig->AutoSkew, TWTY_BOOL);
 
-	//智能过滤空白页，必须设置CAP_DUPLEXENABLED为false方可生效！
 	set_CapabilityOneValue(CCAP_CEI_BLANKSKIP, m_pDriverConfig->AutoDiscardBlankPage, TWTY_INT32);
 
-	//单张是否扫双面
 	set_CapabilityOneValue(CAP_DUPLEXENABLED, m_pDriverConfig->DuplexEnabled, TWTY_BOOL);
 
-	//双页进纸检测
 	set_CapabilityOneValue(CCAP_DOUBLEFEEDDETECTION, m_pDriverConfig->DoubleFeedDetection, TWTY_BOOL);
 
-	//隐藏扫描进度条：0表示隐藏，1表示显示。
 	set_CapabilityOneValue(CAP_INDICATORS, m_pDriverConfig->Indicator, TWTY_BOOL);
 
 	// 0:BW, 1:GRAY, 2:RGB
 	set_CapabilityOneValue(ICAP_PIXELTYPE, m_pDriverConfig->PixelType, TWTY_UINT16);
 
-	//隐藏扫描仪卡纸提示
 	set_CapabilityOneValue(CCAP_QUIETERRORS, m_pDriverConfig->QuietErrors, TWTY_BOOL);
 
-	//隐藏无纸检测提示：1表示隐藏，0表示显示
 	set_CapabilityOneValue(CCAP_QUIET_NOPAGEDIALOG, m_pDriverConfig->QuietNoPageDialog, TWTY_BOOL);
 
-	//分辨率 200 dpi.
 	TW_FIX32 resolution;
 	resolution.Whole = m_pDriverConfig->ResolutionWhole; // 200
 	resolution.Frac = m_pDriverConfig->ResolutionFraction; // 0
 	set_ICAP_RESOLUTION(ICAP_XRESOLUTION, &resolution);
 	set_ICAP_RESOLUTION(ICAP_YRESOLUTION, &resolution);
 
-	//对比度
 	TW_FIX32 contrast;
 	contrast.Whole = m_pDriverConfig->Contrast;
 	contrast.Frac = 0;
 	set_CapabilityOneValue(ICAP_CONTRAST, &contrast);
 
-	//亮度
 	TW_FIX32 brightness;
 	brightness.Whole = m_pDriverConfig->Brightness;
 	brightness.Frac = 0;
-	set_CapabilityOneValue(ICAP_BRIGHTNESS, &brightness); // 亮度
+	set_CapabilityOneValue(ICAP_BRIGHTNESS, &brightness); //
 
-	//自动进纸：多张纸的话不会停顿。
-	//set_CapabilityOneValue(CAP_FEEDERENABLED, TRUE, TWTY_BOOL);  //CAP_FEEDERENDABLE必须为TRUE才可以使CAP_AUTOFEED生效。
+	//set_CapabilityOneValue(CAP_FEEDERENABLED, TRUE, TWTY_BOOL);  //CAP_FEEDERENDABLE must be TRUE to enable CAP_AUTOFEED
 	set_CapabilityOneValue(CAP_AUTOFEED, TRUE, TWTY_BOOL);
 
-	//	set_CapabilityOneValue(0x80B8, 1, TWTY_UINT16); // 设置： 1（图像及内容）
-	//	set_CapabilityOneValue(0x80A2, 0, TWTY_BOOL); // 除去阴影: 不选（0）， 选择（1）
+	//	set_CapabilityOneValue(0x80B8, 1, TWTY_UINT16);
+	//	set_CapabilityOneValue(0x80A2, 0, TWTY_BOOL);
 
-	// 红色增强
 	set_CapabilityOneValue(CAP_CUSTOMBASE + 50, m_pDriverConfig->RedColorEnhance, TWTY_INT32);
 
 }
 
 void TwainAppCMD::InitKodak() {
 
-	//边界检测done
 	set_CapabilityOneValue(ICAP_AUTOMATICBORDERDETECTION, m_pDriverConfig->AutoBorderDetection, TWTY_BOOL);
 
-	//倾斜校正done
 	set_CapabilityOneValue(ICAP_AUTOMATICDESKEW, m_pDriverConfig->AutoSkew, TWTY_BOOL);
 
-	//显示语言done
 	set_CapabilityOneValue(CAP_LANGUAGE, TWLG_CHINESE, TWTY_UINT16);
 
-	//进度条done
 	set_CapabilityOneValue(CAP_INDICATORS, m_pDriverConfig->Indicator, TWTY_BOOL);
 
-	//双面扫描done
 	set_CapabilityOneValue(CAP_DUPLEXENABLED, m_pDriverConfig->DuplexEnabled, TWTY_BOOL);  // 1
 
-	//双页进纸检测done
-	if (m_pDriverConfig->DoubleFeedDetection == 0){//表示检测
+	if (m_pDriverConfig->DoubleFeedDetection == 0){
 		set_CapabilityOneValue(KCAP_DOUBLEFEEDDETECTION, m_pDriverConfig->DoubleFeedDetection, TWTY_UINT16);
 	}
-	else
-		;//使用默认设置（不检测）
 
 	ScanType scanType = ScanManager::getInstance()->getScanType();
-	//自动旋转
 	if (scanType == kEditableTemplate || scanType == kOriginalPaper) {
 		set_CapabilityOneValue(ICAP_AUTOMATICROTATE, m_pDriverConfig->AutoRotate, TWTY_BOOL);
-		//旋转指定角度TWOR_ROT0, TWOR_ROT90, TWOR_ROT180, TWOR_ROT270
 		set_CapabilityOneValue(KCAP_ORIENTATION, m_pDriverConfig->Orientation, TWTY_INT32);
 	}
 	else{
 		set_CapabilityOneValue(ICAP_AUTOMATICROTATE, FALSE, TWTY_BOOL);		//1
-		//旋转指定角度TWOR_ROT0, TWOR_ROT90, TWOR_ROT180, TWOR_ROT270
+		//TWOR_ROT0, TWOR_ROT90, TWOR_ROT180, TWOR_ROT270
 		set_CapabilityOneValue(KCAP_ORIENTATION, m_pDriverConfig->Orientation, TWTY_INT32);
 	}
 
@@ -906,7 +857,6 @@ void TwainAppCMD::InitKodak() {
 	set_ICAP_RESOLUTION(ICAP_XRESOLUTION, &resolution);
 	set_ICAP_RESOLUTION(ICAP_YRESOLUTION, &resolution);
 
-	//对比度：必须在ICAP_BITDEPTHREDUCTION前进行设置，否则不生效！
 	TW_FIX32 contrast;
 	contrast.Whole = m_pDriverConfig->Contrast;
 	contrast.Frac = 0;
@@ -915,8 +865,6 @@ void TwainAppCMD::InitKodak() {
 	//ICAP_BITDEPTHREDUCTION
 	set_CapabilityOneValue(ICAP_BITDEPTHREDUCTION, TWBR_THRESHOLD, TWTY_UINT16);
 
-	// 亮度: 以黑白的方式进行扫描，则亮度无法调节
-	// 阈值，和亮度效果相反, 可以调节
 	TW_FIX32 threshold;
 	threshold.Whole = abs(255 - (m_pDriverConfig->Brightness + 1000) / (2000.0 / 255));
 	threshold.Frac = 0;
@@ -927,59 +875,50 @@ void TwainAppCMD::InitFujitsu(){
 	TW_UINT16 flag;
 	set_CapabilityOneValue(ICAP_UNITS, 0, TWTY_UINT16);
 	// 0:BW, 1:GRAY, 2:RGB, TBC..TBD
-	set_CapabilityOneValue(ICAP_PIXELTYPE, m_pDriverConfig->PixelType, TWTY_UINT16);						//分辨率为黑白模式
+	set_CapabilityOneValue(ICAP_PIXELTYPE, m_pDriverConfig->PixelType, TWTY_UINT16);
 
-	set_CapabilityOneValue(CAP_DUPLEXENABLED, m_pDriverConfig->DuplexEnabled, TWTY_BOOL);   //双面
+	set_CapabilityOneValue(CAP_DUPLEXENABLED, m_pDriverConfig->DuplexEnabled, TWTY_BOOL);
 
-	//分辨率done
 	TW_FIX32 resolution;
-	resolution.Whole = m_pDriverConfig->ResolutionWhole;;									//  分辨率dpi
+	resolution.Whole = m_pDriverConfig->ResolutionWhole;
 	resolution.Frac = m_pDriverConfig->ResolutionFraction;	// 0
 	set_ICAP_RESOLUTION(ICAP_XRESOLUTION, &resolution);
 	set_ICAP_RESOLUTION(ICAP_YRESOLUTION, &resolution);
 	TW_FIX32 wf = FloatToFIX32(360);
-	flag = set_CapabilityOneValue(ICAP_ROTATION, &wf);		//旋转360度  成功
+	flag = set_CapabilityOneValue(ICAP_ROTATION, &wf);
 
-	set_CapabilityOneValue(ICAP_AUTOSIZE, 1, TWTY_BOOL);	//自动边框检测
+	set_CapabilityOneValue(ICAP_AUTOSIZE, 1, TWTY_BOOL);
 	//		TWSS_NONE TWSS_JISB5 TWSS_USLETTER TWSS_USLEGAL
 	//		TWSS_USLEDGER TWSS_A3 TWSS_A4 TWSS_A5 TWSS_A6 TWSS_JISB4 TWSS_JISB6 TWSS_BUSINESSCARD
-	set_CapabilityOneValue(ICAP_SUPPORTEDSIZES, TWSS_A3, TWTY_UINT16);			//默认设置为A3
+	set_CapabilityOneValue(ICAP_SUPPORTEDSIZES, TWSS_A3, TWTY_UINT16);
 
-	//边界检测done
 	set_CapabilityOneValue(ICAP_AUTOMATICBORDERDETECTION, m_pDriverConfig->AutoBorderDetection, TWTY_BOOL);
 
-	//过滤空白页done
 	set_CapabilityOneValue(PCAP_AUTOSKIPBLANKPAGES, m_pDriverConfig->AutoDiscardBlankPage, TWTY_INT32);
 
-	//扫描指示器done
 	set_CapabilityOneValue(CAP_INDICATORS, m_pDriverConfig->Indicator, TWTY_BOOL);
 
-	//隐藏错误弹窗done
 	set_CapabilityOneValue(PCAP_HIDEERRDIALOG, m_pDriverConfig->HideErrDialog, TWTY_BOOL);	//最好为false
 
-	//是否显示错误信息done
 	set_CapabilityOneValue(PCAP_SHOWERRMSG, m_pDriverConfig->ShowErrMsg, TWTY_BOOL); // 最好为true
 
-	//自动长度检测，如果设置了边界检测，此值的设置将被忽略！
 	set_CapabilityOneValue(ICAP_AUTOMATICLENGTHDETECTION, FALSE, TWTY_BOOL);
 
-	// 图像增强
 	set_CapabilityOneValue(0x8200, m_pDriverConfig->RedColorEnhance, TWTY_UINT16);
 
-	//双页进纸检测done
 	set_CapabilityOneValue(PCAP_DOUBLEFEEDDETECTION, m_pDriverConfig->DoubleFeedDetection, TWTY_UINT16);
 	set_CapabilityOneValue(PCAP_DOUBLEFEEDDETECTION_SENSITIVITY, m_pDriverConfig->DoubleFeedDetectionSensitivity, TWTY_UINT16); // -灵敏度: 1. 正常
 	set_CapabilityOneValue(PCAP_DOUBLEFEEDDETECTION_ACTION, m_pDriverConfig->DoubleFeedDetectionResponse, TWTY_UINT16); // -动作: 停止(2)
 
 
-	//阈值是ICAP_THRESHOLD  
-	//富士通的阈值一定要放在对比度的前面 否则不生效 
+	//阈值是ICAP_THRESHOLD
+	//富士通的阈值一定要放在对比度的前面 否则不生效
 	TW_FIX32 brightness;
 	brightness.Whole = abs(255 - (m_pDriverConfig->Brightness + 1000) / (2000.0 / 255));
 	brightness.Frac = 0;
 	set_CapabilityOneValue(ICAP_THRESHOLD, &brightness); // 亮度
 
-	//对比度 
+	//对比度
 	TW_FIX32 contrast;
 	contrast.Whole = abs(m_pDriverConfig->Contrast) / (2000.0 / 255);
 	contrast.Frac = 0;
