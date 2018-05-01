@@ -70,6 +70,7 @@ TW_ENTRYPOINT g_DSM_Entry = { 0 };  /**< global pointer to the TWAIN entry point
 #include <dlfcn.h>
 #endif
 
+
 TW_UINT16 _DSM_Entry(pTW_IDENTITY _pOrigin,
 	pTW_IDENTITY _pDest,
 	TW_UINT32    _DG,
