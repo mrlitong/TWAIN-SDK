@@ -187,10 +187,10 @@ int CTwain::DoNativeTransfer(void)
 ```C
 LRESULT CTwainAppView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    if (message==PM_XFERDONE)   // 收到 PM_XFERDONE 消息
+    if (message==PM_XFERDONE)   // Recieve PM_XFERDONE message
 	{
-	    HBITMAP hBmp=FixUp(HANDLE(wParam));  // 图像转换处理
-	    Bitmap *pBm=0;           // GDI+的Bitmap对象
+	    HBITMAP hBmp=FixUp(HANDLE(wParam));  // image transform handling
+	    Bitmap *pBm=0;           // GDI+ object
 	    pBmp=pBm->FromHBITMAP(hBmp,hDibPal);
 	    Invalidate();
    		//...
