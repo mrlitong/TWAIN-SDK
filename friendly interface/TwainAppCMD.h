@@ -61,7 +61,7 @@ typedef void* HWND;
 using namespace std;
 
 #ifdef TWNDS_OS_LINUX
-#include <semaphore.h> 
+#include <semaphore.h>
 #endif
 
 
@@ -98,16 +98,14 @@ public:
 	*/
 	int loadDS(bool isRedPaper = false);
 	/**
-	* @param[in] _dsID, if -1, then try using default data source; 
+	* @param[in] _dsID, if -1, then try using default data source;
 	*                        otherwise use specified data source
-	* Note: 会在 getSources() 之后调用，意味着m_DSIndex会是0
 	*/
 	int tryLoadDS(TW_INT32 _dsID);
-	
+
 	/**
 	* Override so we can Initilize
 	* @param[in] _dsID the ID of the datasource to load
-	* 特殊情况下对配置进行修改,修改对比度
 	*/
 	//virtual int beforeLoadDS(const TW_INT32 _dsID);
 
@@ -154,9 +152,8 @@ public:
 
 	void InitCanon();
 	void InitPanasonic();
-	//柯达自己定义了很多独特的规则，恩，不多说了，大家小心
+
 	void InitKodak();
-	///新加富士通的初始化
 	void InitFujitsu();
 
 	void InitScanner(const std::string& scannerName);
